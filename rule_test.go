@@ -419,3 +419,43 @@ func TestCronRuleSetDayOfWeekPattern02(t *testing.T) {
 		return
 	}
 }
+
+func TestCronRuleSetRule01(t *testing.T) {
+	var r CronRule
+	if err := r.SetRule("1", "2", "31", "12", "5"); nil != err {
+		t.Errorf("unexpect result: %#v; %v", &r, err)
+		return
+	}
+	if r.minuteValuePoints != 0x02 {
+		t.Errorf("unexpect result: %#v; 0x%X", &r, r.minuteValuePoints)
+		return
+	}
+	if r.hourValuePoints != 0x04 {
+		t.Errorf("unexpect result: %#v; 0x%X", &r, r.hourValuePoints)
+		return
+	}
+	if r.dayValuePoints != 0x80000000 {
+		t.Errorf("unexpect result: %#v; 0x%X", &r, r.dayValuePoints)
+		return
+	}
+	if r.lastDayOfMonth {
+		t.Errorf("unexpect result: %#v; %v", &r, r.lastDayOfMonth)
+		return
+	}
+	if r.nearestWeekdayValuePoints != 0 {
+		t.Errorf("unexpect result: %#v; %v", &r, r.nearestWeekdayValuePoints)
+		return
+	}
+	if r.monthValuePoints != 0x1000 {
+		t.Errorf("unexpect result: %#v; 0x%X", &r, r.monthValuePoints)
+		return
+	}
+	if r.dayOfWeekValuePoints != 0x20 {
+		t.Errorf("unexpect result: %#v; 0x%X", &r, r.dayOfWeekValuePoints)
+		return
+	}
+	if r.lastDayOfWeekValuePoints != 0x00 {
+		t.Errorf("unexpect result: %#v; 0x%X", &r, r.dayOfWeekValuePoints)
+		return
+	}
+}

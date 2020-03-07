@@ -111,3 +111,23 @@ func (r *CronRule) setDayOfWeekPattern(patternText string) (err error) {
 	}
 	return
 }
+
+// SetRule parse and assign given cron patterns.
+func (r *CronRule) SetRule(minutePattern, hourPattern, dayPattern, monthPattern, dayOfWeekPattern string) (err error) {
+	if err = r.setMinutePattern(minutePattern); nil != err {
+		return
+	}
+	if err = r.setHourPattern(hourPattern); nil != err {
+		return
+	}
+	if err = r.setDayPattern(dayPattern); nil != err {
+		return
+	}
+	if err = r.setMonthPattern(monthPattern); nil != err {
+		return
+	}
+	if err = r.setDayOfWeekPattern(dayOfWeekPattern); nil != err {
+		return
+	}
+	return
+}
