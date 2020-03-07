@@ -28,7 +28,7 @@ func (s *parsingState) checkValue(valueMin, valueCap int) (ok bool) {
 	return true
 }
 
-func parseElementText(t string, rangeMin, rangeMax, valueCap int) (result *parsedElement, err error) {
+func parseElementText(t string, rangeMin, rangeMax, valueCap int, allowEmptyLast bool) (result *parsedElement, err error) {
 	var elem parsedElement
 	var d parsingState
 	t = t + ","
@@ -70,7 +70,7 @@ func parseElementText(t string, rangeMin, rangeMax, valueCap int) (result *parse
 				return nil, newErrCronExpression(ErrSyntaxUnexpectCharacter, idx)
 			}
 		case ch == ',':
-			if !d.checkValue(rangeMin, valueCap) {
+			if (d.ruleType != ruleEmpty) && ((d.ruleType != ruleLast) || (!allowEmptyLast)) && (!d.checkValue(rangeMin, valueCap)) {
 				return nil, newErrCronExpression(ErrValueOutOfValidRange, idx-1)
 			}
 			if errType := elem.addParsingState(&d); errType != noneExpressionErr {
