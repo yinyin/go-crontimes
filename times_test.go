@@ -209,3 +209,87 @@ func TestCronTimesIterator3DST(t *testing.T) {
 		t.Errorf("unexpect cycle count: %d vs. %d", expCount, cycleCount)
 	}
 }
+
+func TestCronTimesIterator4Every3Hour(t *testing.T) {
+	tz := time.UTC
+	t0 := time.Date(2012, 7, 20, 10, 39, 20, 199, tz)
+	t1 := time.Date(2012, 7, 22, 23, 5, 27, 199, tz)
+	cronTimes := CronTimes{}
+	if err := cronTimes.SetRule("19", "*/3", "*", "*", "*"); nil != err {
+		t.Errorf("cannot set rule: %v", err)
+		return
+	}
+	cronTimes.SetRange(t0, t1, tz)
+	tHave := cronTimes.NextTime()
+	for !tHave.IsZero() {
+		if tHave.Second() != 0 {
+			t.Errorf("unexpect second (%v)", tHave)
+		}
+		if tHave.Minute() != 19 {
+			t.Errorf("unexpect minute (%v)", tHave)
+		}
+		if h := tHave.Hour(); (h % 3) != 0 {
+			t.Errorf("unexpect hour %d (%v)", h, tHave)
+		}
+		tHave = cronTimes.NextTime()
+	}
+}
+
+func TestCronTimesIterator5Annually(t *testing.T) {
+	tz := time.UTC
+	t0 := time.Date(2000, 9, 13, 1, 47, 16, 199, tz)
+	t1 := time.Date(2003, 12, 22, 23, 5, 27, 199, tz)
+	cronTimes := CronTimes{}
+	if err := cronTimes.SetRule("19", "3", "7", "1", "*"); nil != err {
+		t.Errorf("cannot set rule: %v", err)
+		return
+	}
+	cronTimes.SetRange(t0, t1, tz)
+	tHave := cronTimes.NextTime()
+	for !tHave.IsZero() {
+		if tHave.Second() != 0 {
+			t.Errorf("unexpect second (%v)", tHave)
+		}
+		if tHave.Minute() != 19 {
+			t.Errorf("unexpect minute (%v)", tHave)
+		}
+		if tHave.Hour() != 3 {
+			t.Errorf("unexpect hour (%v)", tHave)
+		}
+		if tHave.Day() != 7 {
+			t.Errorf("unexpect day (%v)", tHave)
+		}
+		if tHave.Month() != time.January {
+			t.Errorf("unexpect month (%v)", tHave)
+		}
+		tHave = cronTimes.NextTime()
+	}
+}
+
+func TestCronTimesIterator6(t *testing.T) {
+	tz := time.UTC
+	t0 := time.Date(2012, 7, 20, 10, 39, 20, 199, tz)
+	t1 := time.Date(2012, 8, 22, 23, 5, 27, 199, tz)
+	cronTimes := CronTimes{}
+	if err := cronTimes.SetRule("19", "3", "*", "*", "6,7"); nil != err {
+		t.Errorf("cannot set rule: %v", err)
+		return
+	}
+	cronTimes.SetRange(t0, t1, tz)
+	tHave := cronTimes.NextTime()
+	for !tHave.IsZero() {
+		if tHave.Second() != 0 {
+			t.Errorf("unexpect second (%v)", tHave)
+		}
+		if tHave.Minute() != 19 {
+			t.Errorf("unexpect minute (%v)", tHave)
+		}
+		if tHave.Hour() != 3 {
+			t.Errorf("unexpect hour (%v)", tHave)
+		}
+		if (tHave.Weekday() != time.Saturday) && (tHave.Weekday() != time.Sunday) {
+			t.Errorf("unexpect weekday (%v)", tHave)
+		}
+		tHave = cronTimes.NextTime()
+	}
+}
