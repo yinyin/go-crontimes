@@ -324,6 +324,12 @@ func (c *CronTimes) isMatchingLastDayOfWeek() bool {
 		((c.day + 7) > numberOfDaysForMonth(c.month, c.inLeapYear))
 }
 
+// isMatchingMonth check if month is matched.
+// Include rules like: *, */3, 2,5,8,11, 7-10
+func (c *CronTimes) isMatchingMonth() bool {
+	return (((1 << c.month) & c.monthValuePoints) != 0)
+}
+
 // isMatchingDayOfWeek check if day of week is matched.
 // Include rules like: *, 1-3, */2
 func (c *CronTimes) isMatchingDayOfWeek() bool {
@@ -372,7 +378,8 @@ func (c *CronTimes) seekNextMatch() matchStatus {
 	if c.iterationCompleted() {
 		return matchExceedBoundary
 	}
-	for !((c.isMatchingDay() || c.isMatchingLastDayOfMonth() || c.isMatchingNearestWeekday()) &&
+	for !(c.isMatchingMonth() &&
+		(c.isMatchingDay() || c.isMatchingLastDayOfMonth() || c.isMatchingNearestWeekday()) &&
 		(c.isMatchingDayOfWeek() || c.isMatchingLastDayOfWeek())) {
 		c.moveToNextDay()
 		c.updateDST()
