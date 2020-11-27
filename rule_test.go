@@ -420,12 +420,7 @@ func TestCronRuleSetDayOfWeekPattern02(t *testing.T) {
 	}
 }
 
-func TestCronRuleSetRule01(t *testing.T) {
-	var r CronRule
-	if err := r.SetRule("1", "2", "31", "12", "5"); nil != err {
-		t.Errorf("unexpect result: %#v; %v", &r, err)
-		return
-	}
+func checkCronRuleSetRule01(t *testing.T, r *CronRule) {
 	if r.minuteValuePoints != 0x02 {
 		t.Errorf("unexpect result: %#v; 0x%X", &r, r.minuteValuePoints)
 		return
@@ -458,4 +453,23 @@ func TestCronRuleSetRule01(t *testing.T) {
 		t.Errorf("unexpect result: %#v; 0x%X", &r, r.dayOfWeekValuePoints)
 		return
 	}
+}
+
+func TestCronRuleSetRule01(t *testing.T) {
+	var r0, r1 CronRule
+	if err := r0.SetRule("1", "2", "31", "12", "5"); nil != err {
+		t.Errorf("unexpect result: %#v; %v", &r0, err)
+		return
+	}
+	checkCronRuleSetRule01(t, &r0)
+	d, err := r0.MarshalBinary()
+	if nil != err {
+		t.Errorf("unexpect marshal result: %#v; %v", &r0, err)
+		return
+	}
+	if err = r1.UnmarshalBinary(d); nil != err {
+		t.Errorf("unexpect unmarshal result: %#v; %v", &r1, err)
+		return
+	}
+	checkCronRuleSetRule01(t, &r1)
 }

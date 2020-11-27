@@ -1,6 +1,7 @@
 package crontimes
 
 import (
+	"errors"
 	"strconv"
 )
 
@@ -43,3 +44,6 @@ func newErrCronExpression(errType ExpressionErrType, charIndex int) (e *ErrCronE
 func (e *ErrCronExpression) Error() string {
 	return "[CronExpressionError: " + e.ErrType.String() + " (" + strconv.FormatInt(int64(e.ErrType), 10) + "), Index=" + strconv.FormatInt(int64(e.CharIndex), 10) + "]"
 }
+
+// ErrBinarySizeMismatch indicate size of given binary is unexpected.
+var ErrBinarySizeMismatch = errors.New("given binary size not match")

@@ -1,5 +1,9 @@
 package crontimes
 
+import (
+	"encoding/binary"
+)
+
 // CronRule contains parsed cron rule expression.
 type CronRule struct {
 	minuteValuePoints         uint64
@@ -129,5 +133,41 @@ func (r *CronRule) SetRule(minutePattern, hourPattern, dayPattern, monthPattern,
 	if err = r.setDayOfWeekPattern(dayOfWeekPattern); nil != err {
 		return
 	}
+	return
+}
+
+// MarshalBinary implements encoding.BinaryMarshaler interface.
+func (r *CronRule) MarshalBinary() (data []byte, err error) {
+	var flags uint32
+	if r.lastDayOfMonth {
+		flags = 0x1
+	}
+	data = make([]byte, 36)
+	binary.LittleEndian.PutUint64(data[0:], r.minuteValuePoints)
+	binary.LittleEndian.PutUint32(data[8:], r.hourValuePoints)
+	binary.LittleEndian.PutUint32(data[12:], r.dayValuePoints)
+	binary.LittleEndian.PutUint32(data[16:], r.nearestWeekdayValuePoints)
+	binary.LittleEndian.PutUint32(data[20:], r.monthValuePoints)
+	binary.LittleEndian.PutUint32(data[24:], r.dayOfWeekValuePoints)
+	binary.LittleEndian.PutUint32(data[28:], r.lastDayOfWeekValuePoints)
+	binary.LittleEndian.PutUint32(data[32:], flags)
+	return
+}
+
+// UnmarshalBinary implement encoding.BinaryUnmarshaler interface.
+func (r *CronRule) UnmarshalBinary(data []byte) (err error) {
+	if len(data) != 36 {
+		err = ErrBinarySizeMismatch
+		return
+	}
+	r.minuteValuePoints = binary.LittleEndian.Uint64(data[0:])
+	r.hourValuePoints = binary.LittleEndian.Uint32(data[8:])
+	r.dayValuePoints = binary.LittleEndian.Uint32(data[12:])
+	r.nearestWeekdayValuePoints = binary.LittleEndian.Uint32(data[16:])
+	r.monthValuePoints = binary.LittleEndian.Uint32(data[20:])
+	r.dayOfWeekValuePoints = binary.LittleEndian.Uint32(data[24:])
+	r.lastDayOfWeekValuePoints = binary.LittleEndian.Uint32(data[28:])
+	flags := binary.LittleEndian.Uint32(data[32:])
+	r.lastDayOfMonth = (flags & 0x1) != 0
 	return
 }
