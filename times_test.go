@@ -122,14 +122,12 @@ func TestCronTimesIterator1(t *testing.T) {
 	cronTimes.SetRange(t0, t1, tz)
 	tCmp := time.Date(1999, 12, 29, 8, 16, 0, 0, tz)
 	cycleCount := 0
-	tHave := cronTimes.NextTime()
-	for !tHave.IsZero() {
+	for tHave := cronTimes.NextTime(); !tHave.IsZero(); tHave = cronTimes.NextTime() {
 		if !tHave.Equal(tCmp) {
 			t.Errorf("unexpect value (%v vs. %v; cycle %d)", tHave, tCmp, cycleCount)
 			return
 		}
 		tCmp = tCmp.Add(time.Minute)
-		tHave = cronTimes.NextTime()
 		cycleCount++
 	}
 	b0 := time.Date(1999, 12, 29, 8, 16, 0, 0, tz)
@@ -155,14 +153,12 @@ func TestCronTimesIterator2DST(t *testing.T) {
 	cronTimes.SetRange(t0, t1, tz)
 	tCmp := time.Date(2020, 3, 7, 2, 30, 0, 0, tz)
 	cycleCount := 0
-	tHave := cronTimes.NextTime()
-	for !tHave.IsZero() {
+	for tHave := cronTimes.NextTime(); !tHave.IsZero(); tHave = cronTimes.NextTime() {
 		if !tHave.Equal(tCmp) {
 			t.Errorf("unexpect value (%v vs. %v; cycle %d)", tHave, tCmp, cycleCount)
 			return
 		}
 		tCmp = tCmp.Add(time.Minute)
-		tHave = cronTimes.NextTime()
 		cycleCount++
 	}
 	b0 := time.Date(2020, 3, 7, 2, 30, 0, 0, tz)
@@ -189,8 +185,7 @@ func TestCronTimesIterator3DST(t *testing.T) {
 	tCmp := time.Date(2020, 10, 29, 2, 30, 0, 0, tz)
 	tDSTSwitch := time.Date(2020, 11, 1, 7, 0, 0, 0, time.UTC).In(tz)
 	cycleCount := 0
-	tHave := cronTimes.NextTime()
-	for !tHave.IsZero() {
+	for tHave := cronTimes.NextTime(); !tHave.IsZero(); tHave = cronTimes.NextTime() {
 		if !tHave.Equal(tCmp) {
 			t.Errorf("unexpect value (%v vs. %v; cycle %d)", tHave, tCmp, cycleCount)
 			return
@@ -199,7 +194,6 @@ func TestCronTimesIterator3DST(t *testing.T) {
 		if tDSTSwitch.Equal(tCmp) {
 			tCmp = tCmp.Add(time.Hour)
 		}
-		tHave = cronTimes.NextTime()
 		cycleCount++
 	}
 	b0 := time.Date(2020, 10, 29, 2, 30, 0, 0, tz)
@@ -220,8 +214,7 @@ func TestCronTimesIterator4Every3Hour(t *testing.T) {
 		return
 	}
 	cronTimes.SetRange(t0, t1, tz)
-	tHave := cronTimes.NextTime()
-	for !tHave.IsZero() {
+	for tHave := cronTimes.NextTime(); !tHave.IsZero(); tHave = cronTimes.NextTime() {
 		if tHave.Second() != 0 {
 			t.Errorf("unexpect second (%v)", tHave)
 		}
@@ -231,7 +224,6 @@ func TestCronTimesIterator4Every3Hour(t *testing.T) {
 		if h := tHave.Hour(); (h % 3) != 0 {
 			t.Errorf("unexpect hour %d (%v)", h, tHave)
 		}
-		tHave = cronTimes.NextTime()
 	}
 }
 
@@ -245,8 +237,7 @@ func TestCronTimesIterator5Annually(t *testing.T) {
 		return
 	}
 	cronTimes.SetRange(t0, t1, tz)
-	tHave := cronTimes.NextTime()
-	for !tHave.IsZero() {
+	for tHave := cronTimes.NextTime(); !tHave.IsZero(); tHave = cronTimes.NextTime() {
 		if tHave.Second() != 0 {
 			t.Errorf("unexpect second (%v)", tHave)
 		}
@@ -262,7 +253,6 @@ func TestCronTimesIterator5Annually(t *testing.T) {
 		if tHave.Month() != time.January {
 			t.Errorf("unexpect month (%v)", tHave)
 		}
-		tHave = cronTimes.NextTime()
 	}
 }
 
@@ -276,8 +266,7 @@ func TestCronTimesIterator6(t *testing.T) {
 		return
 	}
 	cronTimes.SetRange(t0, t1, tz)
-	tHave := cronTimes.NextTime()
-	for !tHave.IsZero() {
+	for tHave := cronTimes.NextTime(); !tHave.IsZero(); tHave = cronTimes.NextTime() {
 		if tHave.Second() != 0 {
 			t.Errorf("unexpect second (%v)", tHave)
 		}
@@ -290,6 +279,5 @@ func TestCronTimesIterator6(t *testing.T) {
 		if (tHave.Weekday() != time.Saturday) && (tHave.Weekday() != time.Sunday) {
 			t.Errorf("unexpect weekday (%v)", tHave)
 		}
-		tHave = cronTimes.NextTime()
 	}
 }
